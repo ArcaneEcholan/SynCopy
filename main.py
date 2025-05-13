@@ -45,6 +45,7 @@ def clipboard_apply_loop(shared_dir, host_id):
         # print(f"last_applied file: {applied}")
 
         items = sorted(Path(shared_dir).joinpath("items").glob("*.txt"))
+        # TODO: how to sort files
         for item in reversed(items):  # newest first
             if item.name == applied:
                 break
@@ -59,6 +60,8 @@ def clipboard_apply_loop(shared_dir, host_id):
 
 
 shared_dir = str(Path.home() / "nutfiles" / "docs")
+
+# TODO: remove host_id var
 host_id = init_shared_dirs(shared_dir)
 
 threading.Thread(
