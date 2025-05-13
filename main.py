@@ -4,7 +4,7 @@ import time
 import hashlib
 from datetime import datetime, timezone, timedelta
 import threading
-
+import argparse
 
 def generate_filename():
     now = datetime.now().astimezone()
@@ -44,7 +44,11 @@ def clipboard_apply_loop(shared_dir):
         time.sleep(0.1)
 
 
-shared_dir = str(Path.home() / "nutfiles" / "docs")
+parser = argparse.ArgumentParser()
+parser.add_argument('--shared-dir', type=str, required=True, help='path to sync directory where clipboard text files is stored')
+args = parser.parse_args()
+
+shared_dir = args.shared_dir
 
 Path(shared_dir, "items").mkdir(parents=True, exist_ok=True)
 Path(Path.home(), "synccopymeta").mkdir(parents=True, exist_ok=True)
