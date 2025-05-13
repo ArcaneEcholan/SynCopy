@@ -1,7 +1,16 @@
 from pathlib import Path
-import pyperclip, time, hashlib, uuid
-from datetime import datetime
+import pyperclip
+import time
+import hashlib
+from datetime import datetime, timezone, timedelta
 import threading
+
+
+def generate_filename(host_id):
+    now = datetime.now().astimezone()
+    timestamp = now.strftime("%Y%m%dT%H%M%S")
+    ns = time.time_ns() % 1_000_000_000
+    return f"{timestamp}_{ns:09d}__{host_id}.txt"
 
 
 def clipboard_monitor_loop(shared_dir, host_id):
@@ -11,8 +20,7 @@ def clipboard_monitor_loop(shared_dir, host_id):
         h = hashlib.md5(content.encode()).hexdigest()
         if content and h != seen_hash:
             print(f"detect clipboard changed: {content}")
-            timestamp = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-            fname = f"{timestamp}__{host_id}.txt"
+            fname = generate_filename(host_id)
             path = Path(shared_dir) / "items" / fname
             path.write_text(content, encoding="utf-8")
             seen_hash = h
