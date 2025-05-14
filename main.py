@@ -1,3 +1,4 @@
+# TODO: write script to package to exe
 from pathlib import Path
 import pyperclip
 import time
@@ -5,17 +6,37 @@ import hashlib
 from datetime import datetime, timezone, timedelta
 import threading
 import argparse
-
+import json
+import sys
+import os
+import platform
 
 shared_state = {"seen_hash": None, "lock": threading.Lock()}
 
+def get_cache_path(app_name):
+    current_os = platform.system()
+    if current_os == "Linux" or current_os == "Darwin":
+        user_cache_dir = Path.home() / ".cache" / app_name
+        return user_cache_dir
+    elif current_os == "Windows":
+        appdata_dir = Path(os.getenv("LOCALAPPDATA")) / app_name
+        return appdata_dir
+    raise OSError("Unsupported operating system")
+
+
+def get_config_path(app_name):
+    current_os = platform.system()
+    if current_os == "Linux" or current_os == "Darwin":
+        return Path.home() / ".config" / app_name / "config.json"
+    elif current_os == "Windows":
+        return Path(os.getenv("APPDATA")) / app_name / "config.json"
+    raise OSError("Unsupported operating system")
 
 def generate_filename():
     now = datetime.now().astimezone()
     timestamp = now.strftime("%Y%m%dT%H%M%S")
     ns = time.time_ns() % 1_000_000_000
     return f"{timestamp}_{ns:09d}.txt"
-
 
 def clipboard_monitor_loop(sync_dir):
     while True:
@@ -32,7 +53,7 @@ def clipboard_monitor_loop(sync_dir):
 
 
 def clipboard_apply_loop(sync_dir):
-    applied_item_record_file = Path.home() / "synccopymeta" / "last_applied.txt"
+    applied_item_record_file = cache_dir / "last_applied.txt"
     while True:
         applied_item_name = (
             applied_item_record_file.read_text().strip()
@@ -66,20 +87,35 @@ def clipboard_apply_loop(sync_dir):
         time.sleep(0.1)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--sync-dir",
-    type=str,
-    required=True,
-    help="path to sync directory where clipboard text files is stored",
-)
-args = parser.parse_args()
+app_name = "synclipboard"
 
-sync_dir = args.sync_dir
+# make sure config file exists
+cfg_file = get_config_path(app_name=app_name)
+cfg_file.parent.mkdir(parents=True, exist_ok=True)
+if not cfg_file.exists(): 
+    with open(cfg_file.absolute(), "w") as f:
+        f.write("{}")
 
+# read config content
+print(f"try read config file: {cfg_file}")
+with cfg_file.open("r", encoding="utf-8") as f:
+    cfg = json.load(f)
+
+# read config: sync_dir
+sync_dir = cfg.get("sync_dir")
+if sync_dir is None:
+    print("sync_dir option required")
+    os._exit(1)
+print(f"sync-dir: {sync_dir}")
+
+# prepare sync folder
 Path(sync_dir, "items").mkdir(parents=True, exist_ok=True)
-Path(Path.home(), "synccopymeta").mkdir(parents=True, exist_ok=True)
 
+# prepare cache dir
+cache_dir = get_cache_path(app_name=app_name)
+cache_dir.mkdir(exist_ok=True, parents=True)
+
+# start working threads
 threading.Thread(target=clipboard_monitor_loop, args=(sync_dir,), daemon=True).start()
 threading.Thread(target=clipboard_apply_loop, args=(sync_dir,), daemon=True).start()
 
