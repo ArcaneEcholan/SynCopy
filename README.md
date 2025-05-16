@@ -1,6 +1,22 @@
-# 配置文件
+# SynCopy
 
-运行之前要配置同步盘的路径(比如使用坚果云), 以下是配置文件路径:
+## SyncCopy 是什么
+
+SyncCopy 基于文件同步实现跨设备实时同步剪贴板内容。为多设备间互传简单文本提供极大便利。
+
+SyncCopy 监听系统剪贴板的变化，并将内容保存到本地。同时，它还监听本地文件的变化，并将其同步到系统剪贴板。
+
+## 安装
+
+```
+git clone https://github.com/ArcaneEcholan/synclipboard
+```
+
+## 使用
+
+**配置**
+
+配置同步文件夹（比如坚果云）, 配置文件路径：
 
 - Windows 10+: `%APPDATA%/synclipboard/config.json`
   - 注：`%APPDATA%` 通常是：`/Users/你的用户名/AppData/Roaming/synclipboard`
@@ -18,11 +34,11 @@
 
 举例，假如你的坚果云同步路径是: `C:/Users/XiaoMing/nutfiles`
 
-那么，`sync_dir` 可以指定为 `C:/Users/XiaoMing/nutfiles/synclipboard`
+那么 `sync_dir` 指定为 `C:/Users/XiaoMing/nutfiles/synclipboard`
 
-# 执行 main.py
+**运行**
 
-确保安装python3
+确保安装 python3
 
 ```shell
 # 安装必要的依赖包
@@ -31,17 +47,3 @@ pip install pyperclip
 # 运行
 python3 ./main.py
 ```
-
-# 原理
-
-假设：
-
-- 各个设备上的时间是同步的
-- 同步盘（比如坚果云）是可靠的
-- 网络是低时延的
-
-关注单个设备：
-
-- 当检测到同步盘有新的剪切板同步文件时, 将其内容覆盖到剪切板。
-  - 由于假设各设备的时间是一致的，所以可以用文件的创建时间判断新旧。
-- 当检测到剪切板内容更新时，向同步盘创建新的剪切板同步文件。
