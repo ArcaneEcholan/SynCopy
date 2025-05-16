@@ -9,7 +9,7 @@ SyncCopy 监听系统剪贴板的变化，并将内容保存到本地。同时�
 ## 安装
 
 ```
-git clone https://github.com/ArcaneEcholan/synclipboard
+git clone https://github.com/ArcaneEcholan/SynCopy
 ```
 
 ## 使用
@@ -18,9 +18,9 @@ git clone https://github.com/ArcaneEcholan/synclipboard
 
 配置同步文件夹（比如坚果云）, 配置文件路径：
 
-- Windows 10+: `%APPDATA%/synclipboard/config.json`
-  - 注：`%APPDATA%` 通常是：`/Users/你的用户名/AppData/Roaming/synclipboard`
-- Linux: `~/.config/synclipboard/config.json`
+- Windows 10+: `%APPDATA%/SynCopy/config.json`
+  - 注：`%APPDATA%` 通常是：`/Users/你的用户名/AppData/Roaming/SynCopy`
+- Linux: `~/.config/SynCopy/config.json`
 
 手动创建 config.json, 内容示例：
 
@@ -34,7 +34,7 @@ git clone https://github.com/ArcaneEcholan/synclipboard
 
 举例，假如你的坚果云同步路径是: `C:/Users/XiaoMing/nutfiles`
 
-那么 `sync_dir` 指定为 `C:/Users/XiaoMing/nutfiles/synclipboard`
+那么 `sync_dir` 指定为 `C:/Users/XiaoMing/nutfiles/SynCopy`
 
 **运行**
 

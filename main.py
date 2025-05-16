@@ -87,7 +87,7 @@ def clipboard_apply_loop(sync_dir):
         time.sleep(0.1)
 
 
-app_name = "synclipboard"
+app_name = "SynCopy"
 
 # make sure config file exists
 cfg_file = get_config_path(app_name=app_name)
