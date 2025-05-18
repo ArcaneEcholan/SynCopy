@@ -13,6 +13,7 @@ import platform
 
 shared_state = {"seen_hash": None, "lock": threading.Lock()}
 
+
 def get_cache_path(app_name):
     current_os = platform.system()
     if current_os == "Linux" or current_os == "Darwin":
@@ -32,11 +33,13 @@ def get_config_path(app_name):
         return Path(os.getenv("APPDATA")) / app_name / "config.json"
     raise OSError("Unsupported operating system")
 
+
 def generate_filename():
     now = datetime.now().astimezone()
     timestamp = now.strftime("%Y%m%dT%H%M%S")
     ns = time.time_ns() % 1_000_000_000
     return f"{timestamp}_{ns:09d}.txt"
+
 
 def clipboard_monitor_loop(sync_dir):
     while True:
@@ -47,7 +50,7 @@ def clipboard_monitor_loop(sync_dir):
                 print(f"detect clipboard changed: {content}")
                 fname = generate_filename()
                 path = Path(sync_dir) / "items" / fname
-                path.write_text(content, encoding="utf-8")
+                path.write_text(content, encoding="utf-8", newline="")
                 shared_state["seen_hash"] = h
         time.sleep(0.1)
 
@@ -92,7 +95,7 @@ app_name = "SynCopy"
 # make sure config file exists
 cfg_file = get_config_path(app_name=app_name)
 cfg_file.parent.mkdir(parents=True, exist_ok=True)
-if not cfg_file.exists(): 
+if not cfg_file.exists():
     with open(cfg_file.absolute(), "w") as f:
         f.write("{}")
 
