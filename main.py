@@ -1,18 +1,14 @@
-# TODO: write script to package to exe
 from pathlib import Path
 import pyperclip
 import time
 import hashlib
 from datetime import datetime, timezone, timedelta
 import threading
-import argparse
 import json
-import sys
 import os
 import platform
 
 shared_state = {"seen_hash": None, "lock": threading.Lock()}
-
 
 def get_cache_path(app_name):
     current_os = platform.system()
@@ -47,11 +43,15 @@ def clipboard_monitor_loop(sync_dir):
         h = hashlib.md5(content.encode()).hexdigest()
         with shared_state["lock"]:
             if content and h != shared_state["seen_hash"]:
-                print(f"detect clipboard changed: {content}")
+                print("<== clipboard changed")
+                print({content})
+                print("<==")
                 fname = generate_filename()
                 path = Path(sync_dir) / "items" / fname
                 path.write_text(content, encoding="utf-8", newline="")
                 shared_state["seen_hash"] = h
+                applied_item_record_file = cache_dir / "last_applied.txt"
+                applied_item_record_file.write_text(fname)
         time.sleep(0.1)
 
 
@@ -71,9 +71,10 @@ def clipboard_apply_loop(sync_dir):
 
             # found item never applied to clipboard, apply it to clipboard then
             item_content = item.read_text(encoding="utf-8")
-            print(
-                f"found file to apply, copy to clipboard: {item.name}, {item_content}"
-            )
+            print("==> items changed, update clipboard")
+            print({item_content})
+            print("==>")
+
             # overwrite clipboard with new item
             pyperclip.copy(item_content)
 
