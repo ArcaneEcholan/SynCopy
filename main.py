@@ -1,3 +1,4 @@
+# TODO: file change monitor works inefficiently when too many files
 from pathlib import Path
 import pyperclip
 import time
@@ -8,6 +9,8 @@ import json
 import os
 import platform
 
+import sys
+print(sys.version)
 shared_state = {"seen_hash": None, "lock": threading.Lock()}
 
 def get_cache_path(app_name):
@@ -48,7 +51,8 @@ def clipboard_monitor_loop(sync_dir):
                 print("<==")
                 fname = generate_filename()
                 path = Path(sync_dir) / "items" / fname
-                path.write_text(content, encoding="utf-8", newline="")
+                with open(path, "w", encoding="utf-8", newline="") as f:
+                    f.write(content)
                 shared_state["seen_hash"] = h
                 applied_item_record_file = cache_dir / "last_applied.txt"
                 applied_item_record_file.write_text(fname)
