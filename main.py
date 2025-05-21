@@ -3,14 +3,16 @@ from pathlib import Path
 import pyperclip
 import time
 import hashlib
-from datetime import datetime, timezone, timedelta
+from datetime import datetime
 import threading
 import json
 import os
 import platform
-
+import logging
 import sys
-print(sys.version)
+
+logging.basicConfig(level=logging.INFO)
+
 shared_state = {"seen_hash": None, "lock": threading.Lock()}
 
 def get_cache_path(app_name):
@@ -46,9 +48,9 @@ def clipboard_monitor_loop(sync_dir):
         h = hashlib.md5(content.encode()).hexdigest()
         with shared_state["lock"]:
             if content and h != shared_state["seen_hash"]:
-                print("<== clipboard changed")
-                print({content})
-                print("<==")
+                logging.info("<== clipboard changed")
+                logging.info({content})
+                logging.info("<==")
                 fname = generate_filename()
                 path = Path(sync_dir) / "items" / fname
                 with open(path, "w", encoding="utf-8", newline="") as f:
@@ -75,9 +77,9 @@ def clipboard_apply_loop(sync_dir):
 
             # found item never applied to clipboard, apply it to clipboard then
             item_content = item.read_text(encoding="utf-8")
-            print("==> items changed, update clipboard")
-            print({item_content})
-            print("==>")
+            logging.info("==> items changed, update clipboard")
+            logging.info({item_content})
+            logging.info("==>")
 
             # overwrite clipboard with new item
             pyperclip.copy(item_content)
@@ -95,6 +97,8 @@ def clipboard_apply_loop(sync_dir):
         time.sleep(0.1)
 
 
+logging.info(f'python version: {sys.version}')
+
 app_name = "SynCopy"
 
 # make sure config file exists
@@ -105,16 +109,16 @@ if not cfg_file.exists():
         f.write("{}")
 
 # read config content
-print(f"try read config file: {cfg_file}")
+logging.info(f"try read config file: {cfg_file}")
 with cfg_file.open("r", encoding="utf-8") as f:
     cfg = json.load(f)
 
 # read config: sync_dir
 sync_dir = cfg.get("sync_dir")
 if sync_dir is None:
-    print("sync_dir option required")
+    logging.info("sync_dir option required")
     os._exit(1)
-print(f"sync-dir: {sync_dir}")
+logging.info(f"sync-dir: {sync_dir}")
 
 # prepare sync folder
 Path(sync_dir, "items").mkdir(parents=True, exist_ok=True)
