@@ -42,7 +42,7 @@ git clone https://github.com/ArcaneEcholan/SynCopy
 
 **运行**
 
-确保安装 python3
+确保安装 python3.8 以上
 
 ```shell
 # 安装必要的依赖包
