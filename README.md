@@ -52,4 +52,4 @@ pip install pyperclip
 python3 ./main.py
 ```
 
-![](images/使用截图.png)
+![](/images/使用截图.png)
