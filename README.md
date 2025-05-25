@@ -51,3 +51,5 @@ pip install pyperclip
 # 运行
 python3 ./main.py
 ```
+
+![](/images/使用截图.png)
