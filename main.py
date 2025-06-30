@@ -72,6 +72,7 @@ def generate_filename():
 
 def clipboard_monitor_loop(sync_dir):
     while True:
+        time.sleep(0.1)
         try:
             content = pyperclip.paste()
             if content is None:
@@ -91,13 +92,13 @@ def clipboard_monitor_loop(sync_dir):
                     shared_state["seen_hash"] = h
                     applied_item_record_file = cache_dir / "last_applied.txt"
                     applied_item_record_file.write_text(fname)
-            time.sleep(0.1)
         except Exception as ex:
             logging.error(f"Clipboard Monitor Thread Exception Occured: {str(ex)}")
 
 def clipboard_update_loop(sync_dir):
     applied_item_record_file = cache_dir / "last_applied.txt"
     while True:
+        time.sleep(0.1)
         try:
             applied_item_name = (
                 applied_item_record_file.read_text().strip()
@@ -129,8 +130,6 @@ def clipboard_update_loop(sync_dir):
                         item_content.encode()
                     ).hexdigest()
                 break
-
-            time.sleep(0.1)
         except Exception as ex:
             logging.error(f"Items Monitor Thread Exception Occured: {str(ex)}")
 
