@@ -75,13 +75,15 @@ def clipboard_monitor_loop(sync_dir):
         try:
             content = pyperclip.paste()
             if content is None:
+                logging.debug(f"clip_mon_loop: content is empty, next loop")
                 continue
             h = hashlib.md5(content.encode()).hexdigest()
+            logging.debug(f"clip_mon_loop: hash:content: {h}:{content}")
             with shared_state["lock"]:
                 if content and h != shared_state["seen_hash"]:
-                    logging.info("<== clipboard changed")
+                    logging.info("clip_mon_loop: <== clipboard changed")
                     logging.info({content})
-                    logging.info("<==")
+                    logging.info("clip_mon_loop: <==")
                     fname = generate_filename()
                     path = Path(sync_dir) / "items" / fname
                     with open(path, "w", encoding="utf-8", newline="") as f:
@@ -106,6 +108,7 @@ def clipboard_update_loop(sync_dir):
             items = sorted(Path(sync_dir).joinpath("items").glob("*.txt"))
             for item in reversed(items):  # newest item first
                 if item.name == applied_item_name:
+                    logging.debug(f"clip_update_loop: item name found, next update loop: {applied_item_name}")
                     break
 
                 # found item never applied to clipboard, apply it to clipboard then
